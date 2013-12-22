@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html >
+	<head>
+		<meta charset="UTF-8">
+		<title>webgl_test</title>
+        <script src="object3d.js"></script>
+		<script src="main.js"></script>
+	</head>
+	<body>
+
+		<canvas id="webglcv" width="640" height="480"> </canvas>
+		<div id="fragment_shader_src" style="visibility: hidden;">
+            varying lowp vec3 vLighting;
+            varying lowp vec3 vColor;
+			void main(void) {
+   			 gl_FragColor = vec4(vColor*vLighting, 1.0);
+  			}
+		</div>
+		<div id="vertex_shader_src" style="visibility: hidden;">
+			attribute vec3 aVertexPosition;
+            attribute vec3 aVertexNormal;
+			uniform lowp mat4 uMVCMatrix;//camera
+            uniform lowp mat4 uMVOMatrix;//object
+			uniform lowp mat4 uPMatrix;
+			uniform lowp mat4 uRMatrix;
+            uniform lowp mat4 uOriMatrix;
+            uniform lowp mat4 uScaleMatrix;
+            uniform lowp vec3 uColor;
+            
+            varying lowp vec3 vLighting;
+            varying lowp vec3 vColor;
+            
+			void main(void) {
+                const lowp vec3 ambientLightColor = vec3(0.3, 0.3, 0.3);
+                const lowp vec3 directLightDir = vec3(0.0, 0.0, 1.0);
+                const lowp vec3 directLightColor = vec3(.7, .7, .7);
+                
+                gl_Position = uPMatrix * uRMatrix * uMVCMatrix * uMVOMatrix * uOriMatrix * uScaleMatrix * vec4(aVertexPosition, 1.0);
+    
+                lowp vec4 transformedNormal =  uOriMatrix * vec4(aVertexNormal, 1.0);
+                float intensity =max(dot(transformedNormal.xyz, directLightDir), 0.0);
+                vLighting = ambientLightColor + (directLightColor * intensity);
+                
+                vColor = uColor;
+			}
+		</div>
+		<script>
+			start();
+		</script>
+	</body>
+</html>
