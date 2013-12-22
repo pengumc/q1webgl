@@ -16,7 +16,7 @@ function Object3D(){
         1,0,0,0,
         0,1,0,0,
         0,0,1,0,
-        3,0,0,1
+        0,0,0,1
     ]);
 
     this.scale = new Float32Array([
@@ -72,32 +72,37 @@ Object3D.prototype.load_cube = function(){
 
 Object3D.prototype.set_R = function(theta, psi, phi){
     //angles are along x y and z axis, in that order
+    this.R.set(gen_R(theta, psi, phi));
+}
+
+function gen_R(theta, psi, phi){
+    var r = new Array(16);
     var ctheta = Math.cos(theta); //x
     var stheta = Math.sin(theta); //x
     var cpsi = Math.cos(psi); //y
     var spsi = Math.sin(psi); //y
     var cphi = Math.cos(phi); //z
     var sphi = Math.sin(phi); //z
-	this.R[0] = cphi * cpsi;	
-	this.R[1] = -cpsi * sphi;	
-	this.R[2] = -spsi;	
-	this.R[3] = 0;	
+	r[0] = cphi * cpsi;	
+	r[1] = -cpsi * sphi;	
+	r[2] = -spsi;	
+	r[3] = 0;	
 
-	this.R[4] = ctheta * sphi - cphi * stheta * spsi;	
-	this.R[5] = ctheta * cphi + stheta *sphi * spsi;	
-	this.R[6] = -cpsi * stheta;	
-	this.R[7] = 0;	
+	r[4] = ctheta * sphi - cphi * stheta * spsi;	
+	r[5] = ctheta * cphi + stheta *sphi * spsi;	
+	r[6] = -cpsi * stheta;	
+	r[7] = 0;	
 
-	this.R[8] = stheta * sphi + ctheta * cphi * spsi;	
-	this.R[9] = cphi * stheta - ctheta * sphi * spsi;	
-	this.R[10] = ctheta * cpsi;	
-	this.R[11] = 0;	
+	r[8] = stheta * sphi + ctheta * cphi * spsi;	
+	r[9] = cphi * stheta - ctheta * sphi * spsi;	
+	r[10] = ctheta * cpsi;	
+	r[11] = 0;	
 
-	this.R[12] = 0;	
-	this.R[13] = 0;	
-	this.R[14] = 0;	
-	this.R[15] = 1;	
-
+	r[12] = 0;	
+	r[13] = 0;	
+	r[14] = 0;	
+	r[15] = 1;	
+    return(r);
 }
 
 function draw_objects(oArray){
@@ -194,3 +199,36 @@ var base_cube_normals = new Float32Array([
     -1.0, 0.0, 0.0,
     -1.0, 0.0, 0.0
 ]);
+
+function matrix_mult(a, b){
+    var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+        a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
+        a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
+        a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+    var out = new Array(16);
+    // Cache only the current line of the second matrix
+    var b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+    out[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out[3] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
+    out[4] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out[5] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out[6] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out[7] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
+    out[8] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out[9] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out[10] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out[11] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
+    out[12] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    return out;    
+}

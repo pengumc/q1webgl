@@ -17,11 +17,15 @@ var R_matrix = new Float32Array(16);
 var t = (new Date()).getTime()
 var angles = [0.0,0.0,0.0]
 var cubes = new Array;
-var phi = 0.0;
+var Q1;
 
 function start() {
 	var cv = document.getElementById("webglcv");
-    cv.addEventListener("click", function(){for(var i=0;i<10;i++) add_cube();});
+    cv.addEventListener("wheel", scroll);
+    cv.addEventListener("mousedown", mousedown);
+    cv.addEventListener("mouseup", mouseup);
+    cv.addEventListener("mouseleave", mouseleave);
+    cv.addEventListener("mousemove", mousemove);
 	gl = cv.getContext("webgl");
 	
 	shader_program = gl.createProgram();
@@ -45,21 +49,20 @@ function start() {
 	scale_uniform = gl.getUniformLocation(shader_program, "uScaleMatrix");
 	shader_program.R_uniform = gl.getUniformLocation(shader_program, "uRMatrix");
 
-	//setup_cube();
 	p_matrix = generate_perspective_matrix(45, 0.1, 100.0, 640.0, 480.0 );
 	mvc_matrix = new Float32Array([
 		1,0,0,0,
 		0,1,0,0,
 		0,0,1,0,
-		0,0,-6,1
+		0,0,-18,1
 	]);
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
 	gl.viewport(0, 0, 640, 480);
     set_R(0,0,0);
-    for(var i=0;i<3;i++) add_cube();
-    cubes[0].position[2] = 2;
-    setInterval(update, 1000/120);
+    Q1 = new Q1Model();
+    Q1.configure_default();
+    window.setInterval(function(){Q1.draw();}, 10);
 }
 
 function add_cube(){
@@ -168,4 +171,49 @@ function draw(){
 	
 	//draw 4 items
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 24);
+}
+function scroll(e){
+    if(e.deltaY<0){
+        mvc_matrix[14] += 1;
+    }else if(e.deltaY>0){
+        mvc_matrix[14] -= 1;
+    }
+}
+
+var dragging = false;
+var draglastx;
+var draglasty;
+function mouseup(e){
+    if(e.button != 0) return
+    dragging = false;
+}
+function mousedown(e){
+    if(e.button != 0) return
+    dragging = true;
+    draglastx = e.clientX;
+    draglasty = e.clientY;
+}
+function mouseleave(e){
+    dragging = false;
+}
+function mousemove(e){
+    if(e.button != 0) return
+    if (dragging){
+        var x = e.clientX;
+        var y = e.clientY;
+        if (e.ctrlKey){
+            R_matrix.set(matrix_mult(
+                gen_R((draglasty-y)*0.01, 0.0, (x-draglastx)*0.01),
+                R_matrix
+            ));
+        }else{
+            R_matrix.set(matrix_mult(
+                gen_R((draglasty-y)*0.01, (x-draglastx)*0.01, 0.0),
+                R_matrix
+            ));
+        }
+        gl.uniformMatrix4fv(shader_program.R_uniform, false, R_matrix);
+        draglastx=x;
+        draglasty=y;
+    }
 }
