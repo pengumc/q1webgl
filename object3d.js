@@ -60,14 +60,14 @@ function _loadobject(vertices, indices, normals, count){
 
 function _draw(){
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferV);
-    gl.vertexAttribPointer(vertex_position_attribue, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(gl.shader_program1.vertex_position_attribue, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferN);
-    gl.vertexAttribPointer(vertex_normal_attribute, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(gl.shader_program1.vertex_normal_attribute, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufferI);
-    gl.uniformMatrix4fv(ori_uniform, false, this.R);
-    gl.uniformMatrix4fv(mvo_uniform, false, this.mvo_matrix); 
-    gl.uniformMatrix4fv(scale_uniform, false, this.scale);
-    gl.uniform3fv(color_uniform, this.color);
+    gl.uniformMatrix4fv(gl.shader_program1.ori_uniform, false, this.R);
+    gl.uniformMatrix4fv(gl.shader_program1.mvo_uniform, false, this.mvo_matrix); 
+    gl.uniformMatrix4fv(gl.shader_program1.scale_uniform, false, this.scale);
+    gl.uniform3fv(gl.shader_program1.color_uniform, this.color);
     //gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.count);
     gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
 }
@@ -113,11 +113,19 @@ function gen_R(theta, psi, phi){
 
 function draw_objects(oArray){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.uniformMatrix4fv(p_uniform, false, p_matrix);
-	gl.uniformMatrix4fv(mvc_uniform, false, mvc_matrix);
+    //use correct program
+    gl.useProgram(gl.shader_program1);
+    //set program static uniforms
+    gl.uniformMatrix4fv(gl.shader_program1.R_uniform, false, gl.shader_program1.R_matrix);
+    gl.uniformMatrix4fv(gl.shader_program1.p_uniform, false, gl.shader_program1.p_matrix);
+	gl.uniformMatrix4fv(gl.shader_program1.mvc_uniform, false, gl.shader_program1.mvc_matrix);
+    //draw all objects that use that program
     for (var o,i=0;o=oArray[i];i++){
         o.draw();
     }
+    //load next program
+    //set static uniforms
+    
 }
 
 var base_cube_vertices = new Float32Array([
