@@ -27,7 +27,13 @@ function Object3D(){
     ]);
 }
 
-Object3D.prototype.set_position = function(x, y, z){
+Object3D.prototype.set_position = _setpos;
+Object3D.prototype.load_object = _loadobject;
+Object3D.prototype.draw = _draw;
+Object3D.prototype.set_R = _setR;
+Object3D.prototype.load_cube = _loadcube;
+
+function _setpos(x,y,z){
     this.position[0] = x;
     this.position[1] = y;
     this.position[2] = z;
@@ -36,7 +42,7 @@ Object3D.prototype.set_position = function(x, y, z){
     this.mvo_matrix[14] = this.position[2];
 }
 
-Object3D.prototype.load_object = function(vertices, indices, normals, count){
+function _loadobject(vertices, indices, normals, count){
     this.vertices = vertices; //should be  copies?
     this.normals = normals;
     this.indices = indices;
@@ -52,7 +58,7 @@ Object3D.prototype.load_object = function(vertices, indices, normals, count){
     gl.bufferData(gl.ARRAY_BUFFER, this.normals, gl.STATIC_DRAW);
 }
 
-Object3D.prototype.draw = function(){
+function _draw(){
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferV);
     gl.vertexAttribPointer(vertex_position_attribue, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferN);
@@ -66,11 +72,11 @@ Object3D.prototype.draw = function(){
     gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
 }
 
-Object3D.prototype.load_cube = function(){
+function _loadcube(){
     this.load_object(base_cube_vertices, base_cube_indices, base_cube_normals, base_cube_count);
 }
 
-Object3D.prototype.set_R = function(theta, psi, phi){
+function _setR(theta, psi, phi){
     //angles are along x y and z axis, in that order
     this.R.set(gen_R(theta, psi, phi));
 }
