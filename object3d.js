@@ -111,21 +111,30 @@ function gen_R(theta, psi, phi){
     return(r);
 }
 
-function draw_objects(oArray){
+function draw_objects(oArray, lArray){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //use correct program
     gl.useProgram(gl.shader_program1);
+    gl.current_program = gl.shader_program1;
     //set program static uniforms
     gl.uniformMatrix4fv(gl.shader_program1.R_uniform, false, gl.shader_program1.R_matrix);
     gl.uniformMatrix4fv(gl.shader_program1.p_uniform, false, gl.shader_program1.p_matrix);
 	gl.uniformMatrix4fv(gl.shader_program1.mvc_uniform, false, gl.shader_program1.mvc_matrix);
     //draw all objects that use that program
+    //the o.draw dunctions are responsible for the other uniforms
     for (var o,i=0;o=oArray[i];i++){
         o.draw();
     }
     //load next program
+    gl.useProgram(gl.shader_program2);
+    gl.current_program = gl.shader_program2;
     //set static uniforms
-    
+    gl.uniformMatrix4fv(gl.shader_program2.R_uniform, false, gl.shader_program2.R_matrix);
+    gl.uniformMatrix4fv(gl.shader_program2.p_uniform, false, gl.shader_program2.p_matrix);
+    gl.uniformMatrix4fv(gl.shader_program2.mvc_uniform, false, gl.shader_program2.mvc_matrix);
+    for (var l, i=0;l=lArray[i];i++){
+        l.draw();
+    }
 }
 
 var base_cube_vertices = new Float32Array([

@@ -52,14 +52,21 @@
             uniform lowp mat4 uMVOMatrixEnd;//object
 			uniform lowp mat4 uPMatrix;
 			uniform lowp mat4 uRMatrix;
-            //just use 4 vertices
-            //if (aVertexPosition.z == 0) { //thing of something here
-            //gl_Position =  uPMatrix * uMVCMatrix * uRMatrix * uMVOMatrixStart * vec4(aVertexPosition, 1.0);
-            //}else{
-            //gl_Position =  uPMatrix * uMVCMatrix * uRMatrix * uMVOMatrixEnd * vec4(aVertexPosition, 1.0);
-            //}
-            //fragment shader doesn't care if front facing or not
-            //now build two shader programs and switch when drawing lines.
+            uniform lowp vec3 uColor;
+            
+            varying lowp vec3 vLighting;
+            varying lowp vec3 vColor;
+            
+            void main(void){
+                if(aVertexPosition[0] == -1.0)
+                    gl_Position =  uPMatrix * uMVCMatrix * uRMatrix * uMVOMatrixStart * vec4(0.0, 0.0, 0.0, 1.0);
+                else
+                    gl_Position =  uPMatrix * uMVCMatrix * uRMatrix * uMVOMatrixEnd * vec4(0.0, 0.0, 0.0, 1.0);
+                
+                vLighting = vec3(1.0, 1.0, 1.0);
+                vColor = uColor;
+            }
+            
         </div>
 
 		<script>

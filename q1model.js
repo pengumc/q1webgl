@@ -18,6 +18,22 @@ function Q1Model(){
         c.color[0] = 0.0;
         this.endpoints.push(c);
     }
+    //lines
+    this.lines = new Array();
+    var l;
+    l = new Line3D();
+    l.setup_line(this.servos[0], this.servos[3]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[3], this.servos[9]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[6], this.servos[9]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[6], this.servos[0]);
+    this.lines.push(l);
+
 }
 
 Q1Model.prototype.configure_default = function(){
@@ -43,5 +59,5 @@ Q1Model.prototype.configure_default = function(){
 }
 
 Q1Model.prototype.draw = function(){
-    draw_objects(this.servos.concat(this.endpoints));
+    draw_objects(this.servos.concat(this.endpoints), this.lines);
 }
