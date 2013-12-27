@@ -21,6 +21,7 @@ function Q1Model(){
     //lines
     this.lines = new Array();
     var l;
+    //  base
     l = new Line3D();
     l.setup_line(this.servos[0], this.servos[3]);
     this.lines.push(l);
@@ -33,6 +34,47 @@ function Q1Model(){
     l = new Line3D();
     l.setup_line(this.servos[6], this.servos[0]);
     this.lines.push(l);
+    //  leg1
+    l = new Line3D();
+    l.setup_line(this.servos[0], this.servos[1]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[1], this.servos[2]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[2], this.endpoints[0]);
+    this.lines.push(l);
+    //  leg2
+    l = new Line3D();
+    l.setup_line(this.servos[3], this.servos[4]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[4], this.servos[5]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[5], this.endpoints[1]);
+    this.lines.push(l);
+    //  leg3
+    l = new Line3D();
+    l.setup_line(this.servos[6], this.servos[7]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[7], this.servos[8]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[8], this.endpoints[2]);
+    this.lines.push(l);
+    //  leg4
+    l = new Line3D();
+    l.setup_line(this.servos[9], this.servos[10]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[10], this.servos[11]);
+    this.lines.push(l);
+    l = new Line3D();
+    l.setup_line(this.servos[11], this.endpoints[3]);
+    this.lines.push(l);
+
 
 }
 

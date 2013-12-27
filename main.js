@@ -56,7 +56,7 @@ function build_program1(){
 		1,0,0,0,
 		0,1,0,0,
 		0,0,1,0,
-		0,0,-18,1
+		0,4,-38,1
 	]);
 
 	shader_program.mvo_uniform = gl.getUniformLocation(shader_program, "uMVOMatrix");
