@@ -68,7 +68,13 @@
             }
             
         </div>
-
+        <div id="to_texture_shader" style="display:none;">
+            //vertex shader. write entire scene to texture
+            //each object (no lighting) a different shade of blue
+            //read shade for pixel from texture, link to specific object
+            //when no blue, read pixels spiraling outwards until you find something.
+        </div>
+        
 		<script>
 			start();
 		</script>
