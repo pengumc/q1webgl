@@ -27,7 +27,13 @@ function Object3D(){
     ]);
 }
 
-Object3D.prototype.set_position = function(x, y, z){
+Object3D.prototype.set_position = _setpos;
+Object3D.prototype.load_object = _loadobject;
+Object3D.prototype.draw = _draw;
+Object3D.prototype.set_R = _setR;
+Object3D.prototype.load_cube = _loadcube;
+
+function _setpos(x,y,z){
     this.position[0] = x;
     this.position[1] = y;
     this.position[2] = z;
@@ -36,7 +42,7 @@ Object3D.prototype.set_position = function(x, y, z){
     this.mvo_matrix[14] = this.position[2];
 }
 
-Object3D.prototype.load_object = function(vertices, indices, normals, count){
+function _loadobject(vertices, indices, normals, count){
     this.vertices = vertices; //should be  copies?
     this.normals = normals;
     this.indices = indices;
@@ -52,25 +58,25 @@ Object3D.prototype.load_object = function(vertices, indices, normals, count){
     gl.bufferData(gl.ARRAY_BUFFER, this.normals, gl.STATIC_DRAW);
 }
 
-Object3D.prototype.draw = function(){
+function _draw(){
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferV);
-    gl.vertexAttribPointer(vertex_position_attribue, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(gl.shader_program1.vertex_position_attribue, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferN);
-    gl.vertexAttribPointer(vertex_normal_attribute, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(gl.shader_program1.vertex_normal_attribute, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufferI);
-    gl.uniformMatrix4fv(ori_uniform, false, this.R);
-    gl.uniformMatrix4fv(mvo_uniform, false, this.mvo_matrix); 
-    gl.uniformMatrix4fv(scale_uniform, false, this.scale);
-    gl.uniform3fv(color_uniform, this.color);
+    gl.uniformMatrix4fv(gl.shader_program1.ori_uniform, false, this.R);
+    gl.uniformMatrix4fv(gl.shader_program1.mvo_uniform, false, this.mvo_matrix); 
+    gl.uniformMatrix4fv(gl.shader_program1.scale_uniform, false, this.scale);
+    gl.uniform3fv(gl.shader_program1.color_uniform, this.color);
     //gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.count);
     gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
 }
 
-Object3D.prototype.load_cube = function(){
+function _loadcube(){
     this.load_object(base_cube_vertices, base_cube_indices, base_cube_normals, base_cube_count);
 }
 
-Object3D.prototype.set_R = function(theta, psi, phi){
+function _setR(theta, psi, phi){
     //angles are along x y and z axis, in that order
     this.R.set(gen_R(theta, psi, phi));
 }
@@ -105,12 +111,29 @@ function gen_R(theta, psi, phi){
     return(r);
 }
 
-function draw_objects(oArray){
+function draw_objects(oArray, lArray){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.uniformMatrix4fv(p_uniform, false, p_matrix);
-	gl.uniformMatrix4fv(mvc_uniform, false, mvc_matrix);
+    //use correct program
+    gl.useProgram(gl.shader_program1);
+    gl.current_program = gl.shader_program1;
+    //set program static uniforms
+    gl.uniformMatrix4fv(gl.shader_program1.R_uniform, false, gl.shader_program1.R_matrix);
+    gl.uniformMatrix4fv(gl.shader_program1.p_uniform, false, gl.shader_program1.p_matrix);
+	gl.uniformMatrix4fv(gl.shader_program1.mvc_uniform, false, gl.shader_program1.mvc_matrix);
+    //draw all objects that use that program
+    //the o.draw dunctions are responsible for the other uniforms
     for (var o,i=0;o=oArray[i];i++){
         o.draw();
+    }
+    //load next program
+    gl.useProgram(gl.shader_program2);
+    gl.current_program = gl.shader_program2;
+    //set static uniforms
+    gl.uniformMatrix4fv(gl.shader_program2.R_uniform, false, gl.shader_program2.R_matrix);
+    gl.uniformMatrix4fv(gl.shader_program2.p_uniform, false, gl.shader_program2.p_matrix);
+    gl.uniformMatrix4fv(gl.shader_program2.mvc_uniform, false, gl.shader_program2.mvc_matrix);
+    for (var l, i=0;l=lArray[i];i++){
+        l.draw();
     }
 }
 
@@ -200,13 +223,13 @@ var base_cube_normals = new Float32Array([
     -1.0, 0.0, 0.0
 ]);
 
+
 function matrix_mult(a, b){
     var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
         a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
         a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
         a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
     var out = new Array(16);
-    // Cache only the current line of the second matrix
     var b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
     out[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
