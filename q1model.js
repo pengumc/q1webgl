@@ -105,20 +105,20 @@ Q1Model.prototype.draw = function(){
 }
 
 Q1Model.prototype.select = function(i){
-    if(Q1.selection_i>=0 && Q1.selection_i != i){
+    if(this.selection_i>=0 && this.selection_i != i){
     //something still highlighted and selection has changed, so unhighlight
-        if(Q1.selection_i < 12){
-            Q1.servos[Q1.selection_i].color.set([1,0,0]);
-        }else if (Q1.selection_i <16){
-            Q1.endpoints[Q1.selection_i-12].color.set([0,1,1]);
+        if(this.selection_i < 12){
+            this.servos[this.selection_i].color.set([1,0,0]);
+        }else if (this.selection_i <16){
+            this.endpoints[this.selection_i-12].color.set([0,1,1]);
         }
     }
     if(i>=0){
         if(i<12){
-            Q1.servos[i].color.set([0,1,0]);
+            this.servos[i].color.set([0,1,0]);
         }else if(i<16){
-            Q1.endpoints[i-12].color.set([0,1,0]);
+            this.endpoints[i-12].color.set([0,1,0]);
         }
     }
-    Q1.selection_i = i;
+    this.selection_i = i;
 }

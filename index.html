@@ -9,7 +9,7 @@
 		<script src="main.js"></script>
 	</head>
 	<body>
-
+        Drag to rotate around x and y, ctrl+drag to rotate around x and z, scroll to zoom<br>
 		<canvas id="webglcv" width="512" height="512"> </canvas>
         <div id="debug"><div>
 		<div id="fragment_shader_src" style="display:none;">
@@ -38,6 +38,7 @@
                 const lowp vec3 directLightDir = vec3(0.0, 0.0, 1.0);
                 const lowp vec3 directLightColor = vec3(.7, .7, .7);
                 
+                //yes, this is incredibly redundant, i know                
                 gl_Position = uPMatrix * uMVCMatrix * uRMatrix * uMVOMatrix * uOriMatrix * uScaleMatrix * vec4(aVertexPosition, 1.0);
     
                 lowp vec4 transformedNormal =  uOriMatrix * vec4(aVertexNormal, 1.0);
@@ -82,6 +83,7 @@
             varying mediump float index;
             
             void main(void){
+                //yes, this is incredibly redundant, i know
                 gl_Position = uPMatrix * uMVCMatrix * uRMatrix * uMVOMatrix * uOriMatrix * uScaleMatrix * vec4(aVertexPosition, 1.0);
                 index = uIndex;
             }
