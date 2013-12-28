@@ -103,3 +103,22 @@ Q1Model.prototype.configure_default = function(){
 Q1Model.prototype.draw = function(){
     draw_objects(this.servos.concat(this.endpoints), this.lines);
 }
+
+Q1Model.prototype.select = function(i){
+    if(this.selection_i>=0 && this.selection_i != i){
+    //something still highlighted and selection has changed, so unhighlight
+        if(this.selection_i < 12){
+            this.servos[this.selection_i].color.set([1,0,0]);
+        }else if (this.selection_i <16){
+            this.endpoints[this.selection_i-12].color.set([0,1,1]);
+        }
+    }
+    if(i>=0){
+        if(i<12){
+            this.servos[i].color.set([0,1,0]);
+        }else if(i<16){
+            this.endpoints[i-12].color.set([0,1,0]);
+        }
+    }
+    this.selection_i = i;
+}

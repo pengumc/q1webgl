@@ -1,5 +1,6 @@
 /*object3d*/
 
+var object3d_index = 0;
 function Object3D(){
     this.bufferV = gl.createBuffer();
     this.bufferI = gl.createBuffer();
@@ -8,6 +9,7 @@ function Object3D(){
     this.indices;
     this.normals;
     this.count;
+    this.selection_i = -1;
     this.color = new Float32Array([1.0, 1.0, 1.0]);
     this.position = new Float32Array([0,0,0]);
     this.R = new Float32Array(16);
@@ -20,16 +22,18 @@ function Object3D(){
     ]);
 
     this.scale = new Float32Array([
-        .3,0,0,0,
-        0,.3,0,0,
-        0,0,.3,0,
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
         0,0,0,1,
     ]);
+    this.index = object3d_index++;
 }
 
 Object3D.prototype.set_position = _setpos;
 Object3D.prototype.load_object = _loadobject;
 Object3D.prototype.draw = _draw;
+Object3D.prototype.draw_w_3 = _draww3
 Object3D.prototype.set_R = _setR;
 Object3D.prototype.load_cube = _loadcube;
 
@@ -60,7 +64,7 @@ function _loadobject(vertices, indices, normals, count){
 
 function _draw(){
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferV);
-    gl.vertexAttribPointer(gl.shader_program1.vertex_position_attribue, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(gl.shader_program1.vertex_position_attribute, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferN);
     gl.vertexAttribPointer(gl.shader_program1.vertex_normal_attribute, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufferI);
@@ -68,7 +72,17 @@ function _draw(){
     gl.uniformMatrix4fv(gl.shader_program1.mvo_uniform, false, this.mvo_matrix); 
     gl.uniformMatrix4fv(gl.shader_program1.scale_uniform, false, this.scale);
     gl.uniform3fv(gl.shader_program1.color_uniform, this.color);
-    //gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.count);
+    gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
+}
+
+function _draww3(){
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferV);
+    gl.vertexAttribPointer(gl.shader_program3.vertex_position_attribute, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufferI);
+    gl.uniformMatrix4fv(gl.shader_program3.ori_uniform, false, this.R);
+    gl.uniformMatrix4fv(gl.shader_program3.mvo_uniform, false, this.mvo_matrix); 
+    gl.uniformMatrix4fv(gl.shader_program3.scale_uniform, false, this.scale);
+    gl.uniform1f(gl.shader_program3.index_uniform, this.index);
     gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
 }
 
@@ -112,10 +126,23 @@ function gen_R(theta, psi, phi){
 }
 
 function draw_objects(oArray, lArray){
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	gl.viewport(0, 0, 512, 512);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    //use correct program
+    // draw_w_prog3(oArray);
+    draw_w_prog1(oArray);
+    draw_w_prog2(lArray);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, gl.readbackFB);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    draw_w_prog3(oArray);
+    gl.readPixels(0,0,512,512, gl.RGBA, gl.UNSIGNED_BYTE, gl.readbackPixels);
+}
+    
+function draw_w_prog1(oArray){    
     gl.useProgram(gl.shader_program1);
     gl.current_program = gl.shader_program1;
+    gl.enableVertexAttribArray(gl.shader_program1.vertex_position_attribute);
+    gl.enableVertexAttribArray(gl.shader_program1.vertex_normal_attribute);
     //set program static uniforms
     gl.uniformMatrix4fv(gl.shader_program1.R_uniform, false, gl.shader_program1.R_matrix);
     gl.uniformMatrix4fv(gl.shader_program1.p_uniform, false, gl.shader_program1.p_matrix);
@@ -125,15 +152,35 @@ function draw_objects(oArray, lArray){
     for (var o,i=0;o=oArray[i];i++){
         o.draw();
     }
+}
+
+function draw_w_prog2(lArray){
     //load next program
     gl.useProgram(gl.shader_program2);
     gl.current_program = gl.shader_program2;
+    gl.enableVertexAttribArray(gl.shader_program2.vpa);
+    gl.disableVertexAttribArray(1);
     //set static uniforms
     gl.uniformMatrix4fv(gl.shader_program2.R_uniform, false, gl.shader_program2.R_matrix);
     gl.uniformMatrix4fv(gl.shader_program2.p_uniform, false, gl.shader_program2.p_matrix);
     gl.uniformMatrix4fv(gl.shader_program2.mvc_uniform, false, gl.shader_program2.mvc_matrix);
     for (var l, i=0;l=lArray[i];i++){
         l.draw();
+    }
+}
+
+function draw_w_prog3(oArray){
+    gl.useProgram(gl.shader_program3);
+    gl.current_program = gl.shader_program3;
+    gl.enableVertexAttribArray(gl.shader_program3.vertex_position_attribute);
+    gl.disableVertexAttribArray(1);
+    gl.uniformMatrix4fv(gl.shader_program3.R_uniform, false, gl.shader_program3.R_matrix);
+    gl.uniformMatrix4fv(gl.shader_program3.p_uniform, false, gl.shader_program3.p_matrix);
+	gl.uniformMatrix4fv(gl.shader_program3.mvc_uniform, false, gl.shader_program3.mvc_matrix);
+    //draw all objects that use that program
+    //the o.draw dunctions are responsible for the other uniforms
+    for (var o,i=0;o=oArray[i];i++){
+        o.draw_w_3();
     }
 }
 

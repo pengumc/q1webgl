@@ -18,7 +18,7 @@ Line3D.prototype.setup_line = _setupline;
 
 function _line3ddraw(){
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferV);
-    gl.vertexAttribPointer(gl.shader_program2.vertex_position_attribute, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(gl.shader_program2.vpa, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufferI);
     gl.uniformMatrix4fv(gl.shader_program2.mvostart_uniform, false, this.start.mvo_matrix);
     gl.uniformMatrix4fv(gl.shader_program2.mvoend_uniform, false, this.end.mvo_matrix);
