@@ -10,7 +10,8 @@
 	</head>
 	<body>
 
-		<canvas id="webglcv" width="640" height="480"> </canvas>
+		<canvas id="webglcv" width="512" height="512"> </canvas>
+        <div id="debug"><div>
 		<div id="fragment_shader_src" style="display:none;">
             varying lowp vec3 vLighting;
             varying lowp vec3 vColor;
@@ -68,11 +69,30 @@
             }
             
         </div>
-        <div id="to_texture_shader" style="display:none;">
-            //vertex shader. write entire scene to texture
-            //each object (no lighting) a different shade of blue
-            //read shade for pixel from texture, link to specific object
-            //when no blue, read pixels spiraling outwards until you find something.
+        <div id="dumb_vertex_shader" style="display:none;">
+			attribute vec3 aVertexPosition;
+			uniform lowp mat4 uMVCMatrix;//world
+            uniform lowp mat4 uMVOMatrix;//object
+			uniform lowp mat4 uPMatrix;
+			uniform lowp mat4 uRMatrix;
+            uniform lowp mat4 uOriMatrix;
+            uniform lowp mat4 uScaleMatrix;
+            uniform mediump float uIndex;
+            
+            varying mediump float index;
+            
+            void main(void){
+                gl_Position = uPMatrix * uMVCMatrix * uRMatrix * uMVOMatrix * uOriMatrix * uScaleMatrix * vec4(aVertexPosition, 1.0);
+                index = uIndex;
+            }
+            
+        </div>
+        <div id="dumb_fragment_shader" style="display:none;">
+            varying mediump float index;
+            
+            void main(void){
+                gl_FragColor = vec4(0.0, 0.0, (index+1.0)/255.0, 1.0);
+            }
         </div>
         
 		<script>
