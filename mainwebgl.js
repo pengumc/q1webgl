@@ -30,7 +30,7 @@ function start() {
     
     window.setInterval(function(){
         Q1.draw();
-    }, 1000/60);
+    }, 1000/30);
 }
 
 function setup_readback(){
@@ -64,7 +64,6 @@ function build_program1(){
 	gl.attachShader(shader_program, create_vertex_shader1());
 	gl.attachShader(shader_program, create_fragment_shader1());
 	gl.linkProgram(shader_program);
-	document.write(gl.getProgramParameter(shader_program, gl.LINK_STATUS));
 
 	shader_program.vertex_position_attribute = gl.getAttribLocation(shader_program, "aVertexPosition");
 	gl.enableVertexAttribArray(shader_program.vertex_position_attribute);
@@ -97,7 +96,6 @@ function build_program2(){
 	gl.attachShader(shader_program, create_vertex_shader2());
 	gl.attachShader(shader_program, create_fragment_shader1());
 	gl.linkProgram(shader_program);
-	document.write(gl.getProgramParameter(shader_program, gl.LINK_STATUS));
 
 	shader_program.vpa = gl.getAttribLocation(shader_program, "aVertexPosition");
 	gl.enableVertexAttribArray(shader_program.vpa);
@@ -120,7 +118,6 @@ function build_program3(){
 	gl.attachShader(shader_program, create_vertex_shader3());
 	gl.attachShader(shader_program, create_fragment_shader3());
 	gl.linkProgram(shader_program);
-	document.write(gl.getProgramParameter(shader_program, gl.LINK_STATUS));
 
 	shader_program.vertex_position_attribute = gl.getAttribLocation(shader_program, "aVertexPosition");
 	gl.enableVertexAttribArray(shader_program.vertex_position_attribute);
@@ -213,6 +210,7 @@ function scroll(e){
     }else if(e.deltaY>0){
         gl.shader_program1.mvc_matrix[14] -= 1;
     }
+    e.preventDefault();
 }
 
 var dragging = false;
