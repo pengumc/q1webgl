@@ -74,7 +74,42 @@ function Q1Model(){
     l = new Line3D();
     l.setup_line(this.servos[11], this.endpoints[3]);
     this.lines.push(l);
-
+    
+    //gridlines
+    for(var i=0;i<100;i++){
+        var a = {mvo_matrix : new Float32Array([
+            1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            i-50,-50,-10,1
+        ])};
+        var b = {mvo_matrix : new Float32Array([
+            1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            i-50,50,-10,1
+        ])};
+        var c = {mvo_matrix : new Float32Array([
+            1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            -50,i-50,-10,1
+        ])};
+        var d = {mvo_matrix : new Float32Array([
+            1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            50,i-50,-10,1
+        ])};
+        l = new Line3D();
+        l.color.set([.3,.3,.3])
+        l.setup_line(a,b);
+        this.lines.push(l);
+        l = new Line3D();
+        l.color.set([.3,.3,.3])
+        l.setup_line(c,d);
+        this.lines.push(l);
+    }
 
 }
 

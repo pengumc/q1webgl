@@ -3,7 +3,6 @@
 function Line3D(){
     this.bufferV = gl.createBuffer();
     this.bufferI = gl.createBuffer();
-    this.bufferN = gl.createBuffer();
     this.vertices;
     this.indices;
     this.count;
